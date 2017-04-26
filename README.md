@@ -1,4 +1,4 @@
-# selenium-example
+# court-booking
 An example project of selenium using ChromeWebDriver, HtmlUnitDriver, FirefoxFriver
 
 

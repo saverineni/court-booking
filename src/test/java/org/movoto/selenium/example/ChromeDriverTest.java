@@ -20,62 +20,43 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by haozuo on 3/22/16.
- */
 public class ChromeDriverTest {
 
+    public static final String USER_NAME = "8047157";
+    public static final String PASSWORD = "4321";
     private String testUrl;
     private WebDriver driver;
 
     @Before
     public void prepare() {
-        //setup chromedriver
-        System.setProperty(
-                "webdriver.chrome.driver",
-                "webdriver/chromedriver");
-
-        testUrl = "https://leftstick.github.io/";
-
-        // Create a new instance of the Chrome driver
-        // Notice that the remainder of the code relies on the interface,
-        // not the implementation.
+        System.setProperty("webdriver.chrome.driver", "webdriver/chromedriver");
+        testUrl = "https://bookings.traffordleisure.co.uk/Connect/MRMLogin.aspx";
         driver = new ChromeDriver();
-
-        //maximize window
         driver.manage().window().maximize();
-
-        // And now use this to visit myBlog
-        // Alternatively the same thing can be done like this
-        // driver.navigate().to(testUrl);
         driver.get(testUrl);
     }
 
     @Test
-    public void testTitle() throws IOException {
+    public void testLogin() throws IOException {
+        //Login
+        driver.findElement(By.id("ctl00_MainContent_InputLogin")).sendKeys(USER_NAME);
+        driver.findElement(By.id("ctl00_MainContent_InputPassword")).sendKeys(PASSWORD);
+        WebElement element = driver.findElement(By.cssSelector(".signin"));
+        element.click();
 
-        // Find elements by attribute lang="READ_MORE_BTN"
-        List<WebElement> elements = driver
-                .findElements(By.cssSelector("[lang=\"READ_MORE_BTN\"]"));
+        // select activity
+        driver.findElement(By.id("ctl00_MainContent__advanceSearchResultsUserControl_Activities_ctrl2_lnkActivitySelect_lg")).click();
 
-        //Click the selected button
-        elements.get(0).click();
+        System.out.println(driver.getPageSource());
+        WebElement element1 = driver.findElement(By.xpath("//td[@class='itemavailable']"));
+        element1.submit();
 
-
-        assertTrue("The page title should be chagned as expected",
-                (new WebDriverWait(driver, 5))
-                        .until(new ExpectedCondition<Boolean>() {
-                            public Boolean apply(WebDriver d) {
-                                return d.getTitle().equals("我眼中软件工程人员该有的常识");
-                            }
-                        })
-        );
 
     }
 
     @After
     public void teardown() throws IOException {
-        driver.quit();
+        //driver.quit();
     }
 
 }
