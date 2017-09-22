@@ -3,6 +3,8 @@
 #maven
 target
 
+USER_HOME_IS_UNDEFINED
+
 #mac
 .DS_Store
 
@@ -13,4 +15,4 @@ target
 
 #idea
 .idea/
-selenium-chrome-example.iml
+court-booking.iml
