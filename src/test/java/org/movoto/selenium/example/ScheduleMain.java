@@ -22,7 +22,7 @@ public class ScheduleMain {
                 .withIdentity("mySampleTrigger", "sampleGroup")
                 // Specify a schedule
                 .withSchedule(
-                        CronScheduleBuilder.cronSchedule("0 10 15 ? * 6")) //15:10 on every Friday
+                        CronScheduleBuilder.cronSchedule("0 24 16 ? * 6")) //15:10 on every Friday
                 // Build the trigger
                 .build();
 
