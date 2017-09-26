@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -28,8 +29,8 @@ import static org.junit.runners.Parameterized.Parameters;
 public class AltiCourtBookingTest {
 
     public static final String WHATSAPP_LINK = "https://web.whatsapp.com/";
-    public static final String USER_NAME = "8047157";
-    public static final String PASSWORD = "4321";
+    public static final String SURESH_USER_NAME = "8047157";
+    public static final String SURESH_PASSWORD = "4321";
     public static final String LOGIN_URL = "https://bookings.traffordleisure.co.uk/Connect/MRMLogin.aspx";
     public static final String BADMINTON_SPORT_ID = "ctl00_MainContent__advanceSearchResultsUserControl_Activities_ctrl2_lnkActivitySelect_lg";
     private static final String PERSON_NAME = "Guntur Girl";
@@ -42,6 +43,12 @@ public class AltiCourtBookingTest {
     @Parameter(value = 1)
     public String leisureCentre;
 
+    @Parameter(value = 2)
+    public String userName;
+
+    @Parameter(value = 3)
+    public String password;
+
     private String availabilityDateTime = null;
 
     private WebDriverWait wait;
@@ -49,9 +56,9 @@ public class AltiCourtBookingTest {
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"21:30", "ALT"},  //Saturday (keep running program on friday)
-                {"20:30", "SAL"},   //Tuesday (keep running program on monday)
-                {"09:00", "SAL"}    //Sunday (keep running program on saturday)
+                {"21:00", "ALT", SURESH_USER_NAME, SURESH_PASSWORD},  //Saturday (keep running program on friday)
+                {"21:00", "SAL", SURESH_USER_NAME, SURESH_PASSWORD},   //Tuesday (keep running program on monday)
+                {"21:00", "SAL", SURESH_USER_NAME, SURESH_PASSWORD}    //Sunday (keep running program on saturday)
         });
     }
 
@@ -105,6 +112,42 @@ public class AltiCourtBookingTest {
         // postToWhatsapp();
     }
 
+    private void selectLeisureCentre() {
+        // click change site button
+        WebElement webElementSites = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='ctl00__hyperLinkChangePreferredSiteFooter']")));
+        ((JavascriptExecutor) driver).executeScript("window.scrollTo(0," + webElementSites.getLocation().y + ")");
+        webElementSites.click();
+
+        // select desired site from the dropdown and click confirm
+        By xpath = By.xpath("//*[@id='ctl00_MainContent__ddlAvailableSites']");
+        wait.until(ExpectedConditions.elementToBeClickable(xpath));
+        Select select = new Select(driver.findElement(xpath));
+        select.selectByValue(leisureCentre);
+        driver.findElement(By.xpath("//*[@id=\"ctl00_MainContent__btnConfirm\"]")).click();
+
+    }
+
+    private void selectBadmintonSport() {
+        WebElement elementToClick = driver.findElement(By.id(BADMINTON_SPORT_ID));
+        ((JavascriptExecutor) driver).executeScript("window.scrollTo(0," + elementToClick.getLocation().y + ")");
+        elementToClick.click();
+    }
+
+    private void performLogin() {
+        driver.get(LOGIN_URL);
+        driver.findElement(By.id("ctl00_MainContent_InputLogin")).sendKeys(userName);
+        driver.findElement(By.id("ctl00_MainContent_InputPassword")).sendKeys(password);
+        driver.findElement(By.cssSelector(".signin")).click();
+    }
+
+
+    private void NavigateToRequiredDay() {
+        logger.info("Started Booking .....");
+        for (int i : Arrays.asList(1, 2, 3, 4, 5, 6, 7)) {
+            wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_MainContent_Button2"))).click();
+        }
+    }
+
     private void postToWhatsapp() {
         driver.get(WHATSAPP_LINK);
         driver.findElement(By.cssSelector("span[title='" + PERSON_NAME + "']")).click();
@@ -120,46 +163,9 @@ public class AltiCourtBookingTest {
 
     }
 
-    private void selectLeisureCentre() {
-//        WebElement webElement = wait.until(ExpectedConditions.elementToBeClickable((By.xpath("//*[@id='ctl00__hyperLinkChangePreferredSiteFooter']"))));
-//        webElement.click();
-
-        driver.get("https://bookings.traffordleisure.co.uk/Connect/PreferredSiteSelection.aspx");
-        By xpath = By.xpath("//*[@id='ctl00_MainContent__ddlAvailableSites']");
-        WebElement webElement = wait.until(ExpectedConditions.elementToBeClickable(xpath));
-        Select select = new Select(driver.findElement(xpath));
-        select.selectByValue(leisureCentre);
-        driver.findElement(By.xpath("//*[@id=\"ctl00_MainContent__btnConfirm\"]")).click();
-    }
-
-    private void selectBadmintonSport() {
-        //Now wait for invisibility of progress bar first
-        //myWaitVar.until(ExpectedConditions.invisibilityOfElementLocated(By.id("page_loader")));
-        //Now wait till "Cancel" button is showing up. At cases, it may take some time.
-        //WebElement el = myWaitVar.until(ExpectedConditions.elementToBeClickable(By.id("cancelRegister")));
-        //el.click();
-        WebElement webElement = wait.until(ExpectedConditions.elementToBeClickable(By.id(BADMINTON_SPORT_ID)));
-        webElement.click();
-    }
-
-    private void performLogin() {
-        driver.get(LOGIN_URL);
-        driver.findElement(By.id("ctl00_MainContent_InputLogin")).sendKeys(USER_NAME);
-        driver.findElement(By.id("ctl00_MainContent_InputPassword")).sendKeys(PASSWORD);
-        driver.findElement(By.cssSelector(".signin")).click();
-    }
-
-
-    private void NavigateToRequiredDay() {
-        logger.info("Started Booking .....");
-        for (int i : Arrays.asList(1, 2, 3, 4, 5, 6, 7)) {
-            wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_MainContent_Button2"))).click();
-        }
-    }
-
     @After
     public void teardown() throws IOException {
-          driver.quit();
+        driver.quit();
     }
 
 }
