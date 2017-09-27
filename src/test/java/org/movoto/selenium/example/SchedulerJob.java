@@ -16,6 +16,6 @@ public class SchedulerJob implements org.quartz.Job {
     public void execute(JobExecutionContext context) throws JobExecutionException {
         logger.info("Running cronjob .....");
         JUnitCore junit = new JUnitCore();
-        JUnitCore.main("org.movoto.selenium.example.AltiCourtBookingTest");
+        JUnitCore.main("org.movoto.selenium.example.CourtBookingTest");
     }
 }
