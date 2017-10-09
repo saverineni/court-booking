@@ -9,8 +9,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -27,11 +26,13 @@ import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
 
 @RunWith(value = Parameterized.class)
-public class CourtBookingTest {
+public class CourtBookingHeadlessTest {
 
     private static final String WHATSAPP_LINK = "https://web.whatsapp.com/";
     private static final String SURESH_USER_NAME = "8047157";
     private static final String SURESH_PASSWORD = "4321";
+    private static final String BINDU_USER_NAME = "7058801";
+    private static final String BINDU_PASSWORD = "5243";
     private static final String LOGIN_URL = "https://bookings.traffordleisure.co.uk/Connect/MRMLogin.aspx";
     private static final String ONE_HOUR_BADMINTON_SPORT_ID = "ctl00_MainContent__advanceSearchResultsUserControl_Activities_ctrl2_lnkActivitySelect_lg";
     private static final String PERSON_NAME = "Guntur Girl";
@@ -39,7 +40,7 @@ public class CourtBookingTest {
     private static final String DATE_TEXT_ID = "ctl00_MainContent_lblCurrentNavDate";
     private static final int TIME_OUT = 20;
     private WebDriver driver;
-    static Logger logger = LoggerFactory.getLogger(CourtBookingTest.class);
+    static Logger logger = LoggerFactory.getLogger(CourtBookingHeadlessTest.class);
 
     @Parameter(value = 0)
     public String availabilityTime;
@@ -61,20 +62,15 @@ public class CourtBookingTest {
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"08:00", "ALT", SURESH_USER_NAME, SURESH_PASSWORD, 2},  //Saturday (keep running program on friday)
-//                {"10:00", "SAL", SURESH_USER_NAME, SURESH_PASSWORD, 1},  //Saturday (keep running program on friday)
-//                {"10:00", "ALT", SURESH_USER_NAME, SURESH_PASSWORD, 2},  //Saturday (keep running program on friday)
-//                {"10:00", "SAL", SURESH_USER_NAME, SURESH_PASSWORD, 3},  //Saturday (keep running program on friday)
-//                {"10:00", "ALT", SURESH_USER_NAME, SURESH_PASSWORD, 4},  //Saturday (keep running program on friday)
-//                {"10:00", "SAL", SURESH_USER_NAME, SURESH_PASSWORD, 5},  //Saturday (keep running program on friday)
-//                {"10:00", "ALT", SURESH_USER_NAME, SURESH_PASSWORD, 6},    //Sunday (keep running program on saturday)
-//                {"16:00", "SAL", SURESH_USER_NAME, SURESH_PASSWORD, 7}    //Sunday (keep running program on saturday)
+                {"19:00", "SAL", SURESH_USER_NAME, SURESH_PASSWORD, 7},  //play Thursday (5)
+                {"18:00", "ALT", SURESH_USER_NAME, SURESH_PASSWORD, 7},  //play Saturday (7)
+                {"09:00", "SAL", BINDU_USER_NAME, BINDU_PASSWORD, 7},  //play  Sunday(1)
+
         });
     }
 
     @Before
     public void prepare() {
-        System.setProperty("webdriver.chrome.driver", "webdriver/chromedriver");
         setDriverSettings();
         performLogin();
         selectLeisureCentre();
@@ -82,9 +78,7 @@ public class CourtBookingTest {
     }
 
     private void setDriverSettings() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--kiosk");
-        driver = new ChromeDriver(options);
+        driver = new HtmlUnitDriver(true);
         driver.manage().timeouts().implicitlyWait(TIME_OUT, TimeUnit.SECONDS);
         driver.manage().timeouts().pageLoadTimeout(TIME_OUT, TimeUnit.SECONDS);
         driver.manage().timeouts().setScriptTimeout(TIME_OUT, TimeUnit.SECONDS);
@@ -158,21 +152,6 @@ public class CourtBookingTest {
         for (int i = 1; i <= daysFromNow; i++) {
             wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_MainContent_Button2"))).click();
         }
-    }
-
-    private void postToWhatsapp(String availabilityDateTime) {
-        driver.get(WHATSAPP_LINK);
-        driver.findElement(By.cssSelector("span[title='" + PERSON_NAME + "']")).click();
-
-        List<WebElement> list = driver.findElements(By.className("input"));
-
-        WebElement selectedElement = list.get(1);
-        selectedElement.sendKeys(String.format("Booked a court on %s", availabilityDateTime));
-
-        WebElement buttonElement = driver.findElement(By.cssSelector("button[class='icon btn-icon icon-send send-container']"));
-        buttonElement.click();
-        logger.info(String.format("Posted to whatsapp"));
-
     }
 
     @After
