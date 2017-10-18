@@ -61,7 +61,7 @@ public class CourtBookingTest {
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"08:00", "ALT", SURESH_USER_NAME, SURESH_PASSWORD, 2},  //Saturday (keep running program on friday)
+                {"08:00", "ALT", SURESH_USER_NAME, SURESH_PASSWORD, 1},  //Saturday (keep running program on friday)
 //                {"10:00", "SAL", SURESH_USER_NAME, SURESH_PASSWORD, 1},  //Saturday (keep running program on friday)
 //                {"10:00", "ALT", SURESH_USER_NAME, SURESH_PASSWORD, 2},  //Saturday (keep running program on friday)
 //                {"10:00", "SAL", SURESH_USER_NAME, SURESH_PASSWORD, 3},  //Saturday (keep running program on friday)
@@ -83,7 +83,7 @@ public class CourtBookingTest {
 
     private void setDriverSettings() {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--kiosk");
+        //options.addArguments("--kiosk");
         driver = new ChromeDriver(options);
         driver.manage().timeouts().implicitlyWait(TIME_OUT, TimeUnit.SECONDS);
         driver.manage().timeouts().pageLoadTimeout(TIME_OUT, TimeUnit.SECONDS);

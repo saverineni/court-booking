@@ -39,8 +39,8 @@ public class CourtBookingTestWithCourtNumber {
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"21:00"},// last day of the displayed week
-   //             {"21:00"},// last but one day of the displayed week
+                {"21:00"},// last dayOfWeek of the displayed week
+   //             {"21:00"},// last but one dayOfWeek of the displayed week
         });
     }
 
@@ -64,7 +64,7 @@ public class CourtBookingTestWithCourtNumber {
     @Test
     public void testLogin() throws IOException, InterruptedException {
         logger.info("Started Booking .....");
-        // Navigate to the required day
+        // Navigate to the required dayOfWeek
         for (int i : Arrays.asList(1, 2, 3, 4, 5, 6, 7)) {
             wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_MainContent_Button2"))).click();
         }
@@ -96,14 +96,14 @@ public class CourtBookingTestWithCourtNumber {
             }
         }
         if (isAvailable) {
-            // check if the button label is Book or cannot book for the same day
+            // check if the button label is Book or cannot book for the same dayOfWeek
             Boolean isMaximumAllowedReached = driver.findElements(By.id("ctl00_MainContent_pnError")).size() > 0;
             if (!isMaximumAllowedReached) {
                 logger.info(String.format("Booking the available court"));
                 WebElement bookButton = driver.findElement(By.xpath("//input[@value='Book']"));
                 bookButton.click();
             } else {
-                logger.info(String.format("Cannot book more than 1 court on the same day"));
+                logger.info(String.format("Cannot book more than 1 court on the same dayOfWeek"));
             }
         }
     }

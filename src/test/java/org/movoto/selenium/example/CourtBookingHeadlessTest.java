@@ -17,9 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.text.DateFormatSymbols;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.runners.Parameterized.Parameter;
@@ -31,8 +30,8 @@ public class CourtBookingHeadlessTest {
     private static final String WHATSAPP_LINK = "https://web.whatsapp.com/";
     private static final String SURESH_USER_NAME = "8047157";
     private static final String SURESH_PASSWORD = "4321";
-    private static final String BINDU_USER_NAME = "7058801";
-    private static final String BINDU_PASSWORD = "5243";
+    private static final String MANJU_USER_NAME = "8051562";
+    private static final String MANJU_PASSWORD = "4544";
     private static final String LOGIN_URL = "https://bookings.traffordleisure.co.uk/Connect/MRMLogin.aspx";
     private static final String ONE_HOUR_BADMINTON_SPORT_ID = "ctl00_MainContent__advanceSearchResultsUserControl_Activities_ctrl2_lnkActivitySelect_lg";
     private static final String PERSON_NAME = "Guntur Girl";
@@ -57,15 +56,24 @@ public class CourtBookingHeadlessTest {
     @Parameter(value = 4)
     public int daysFromNow;
 
+    @Parameter(value = 5)
+    public int dayOfWeek;
+
     private WebDriverWait wait;
 
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"19:00", "SAL", SURESH_USER_NAME, SURESH_PASSWORD, 7},  //play Thursday (5)
-                {"18:00", "ALT", SURESH_USER_NAME, SURESH_PASSWORD, 7},  //play Saturday (7)
-                {"09:00", "SAL", BINDU_USER_NAME, BINDU_PASSWORD, 7},  //play  Sunday(1)
+                {"20:30", "ALT", SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.WEDNESDAY}, //play  Sunday(1)
 
+                {"19:00", "SAL", SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.THURSDAY},  //play Thursday (5)
+                {"19:30", "SAL", MANJU_USER_NAME, MANJU_PASSWORD,   7, Calendar.THURSDAY},  //play  Thursday(5)
+
+                {"18:00", "ALT", SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SATURDAY},  //play Saturday (7)
+                {"18:30", "ALT", MANJU_USER_NAME, MANJU_PASSWORD,   7, Calendar.SATURDAY},  //play  Saturday(7)
+
+                {"09:00", "SAL", SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SUNDAY},    //play  Sunday(1)
+                {"09:30", "SAL", MANJU_USER_NAME, MANJU_PASSWORD,   7, Calendar.SUNDAY},    //play  Sunday(1)
         });
     }
 
@@ -88,27 +96,38 @@ public class CourtBookingHeadlessTest {
 
     @Test
     public void bookCourt() throws IOException, InterruptedException {
-        NavigateToRequiredDay();
 
-        String availabilityDateTime = driver.findElement(By.id(DATE_TEXT_ID)).getText();
-        availabilityDateTime += " - " + availabilityTime;
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        if (dayOfWeek == cal.get(Calendar.DAY_OF_WEEK)) {
+            logger.info(String.format("Running on  %s", getWeekDay(cal)));
+            NavigateToRequiredDay();
 
-        boolean isAvailable = isAnyCourtAvailable();
-        if (isAvailable) {
-            logger.info(String.format("Found a court at %s on %s", leisureCentre, availabilityDateTime));
-            Boolean isMaximumAllowedReached = driver.findElements(By.id("ctl00_MainContent_pnError")).size() > 0;
-            if (!isMaximumAllowedReached) {
-                logger.info("URL ************" + driver.getCurrentUrl());
-                driver.findElement(By.id("ctl00_MainContent_btnBasket")).click();
-                String successText = driver.findElement(By.xpath("//div[contains(@class,'bookingConfirmedContent-content')]/h1")).getText();
-                logger.info(String.format(successText + " at %s on %s", leisureCentre, availabilityDateTime));
+            String availabilityDateTime = driver.findElement(By.id(DATE_TEXT_ID)).getText();
+            availabilityDateTime += " - " + availabilityTime;
+
+            boolean isAvailable = isAnyCourtAvailable();
+            if (isAvailable) {
+                logger.info(String.format("Found a court at %s on %s", leisureCentre, availabilityDateTime));
+                Boolean isMaximumAllowedReached = driver.findElements(By.id("ctl00_MainContent_pnError")).size() > 0;
+                if (!isMaximumAllowedReached) {
+                    logger.info("URL ************" + driver.getCurrentUrl());
+                    driver.findElement(By.id("ctl00_MainContent_btnBasket")).click();
+                    String successText = driver.findElement(By.xpath("//div[contains(@class,'bookingConfirmedContent-content')]/h1")).getText();
+                    logger.info(String.format(successText + " at %s on %s", leisureCentre, availabilityDateTime));
+                } else {
+                    String failureText = driver.findElement(By.xpath("//div[contains(@class,'alert-danger')]")).getText();
+                    logger.info(String.format("Cannot book the court - %s - %s", failureText, availabilityDateTime));
+                }
             } else {
-                String failureText = driver.findElement(By.xpath("//div[contains(@class,'alert-danger')]")).getText();
-                logger.info(String.format("Cannot book the court - %s - %s", failureText, availabilityDateTime));
+                logger.info(String.format("Court isn't available at %s for leisure centre %s", availabilityDateTime, leisureCentre));
             }
-        } else {
-            logger.info(String.format("Court isn't available at %s for leisure centre %s", availabilityDateTime, leisureCentre));
         }
+    }
+
+    private String getWeekDay(Calendar cal) {
+        String[] weekdays = new DateFormatSymbols().getWeekdays();
+        return weekdays[cal.get(Calendar.DAY_OF_WEEK)];
     }
 
     private boolean isAnyCourtAvailable() {
