@@ -23,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
+import static org.movoto.selenium.example.CourtBookingHeadlessTest.LeisureCentres.ALT;
+import static org.movoto.selenium.example.CourtBookingHeadlessTest.LeisureCentres.SAL;
 
 @RunWith(value = Parameterized.class)
 public class CourtBookingHeadlessTest {
@@ -32,8 +34,11 @@ public class CourtBookingHeadlessTest {
     private static final String SURESH_PASSWORD = "4321";
     private static final String MANJU_USER_NAME = "8051562";
     private static final String MANJU_PASSWORD = "4544";
+    private static final String BINDU_USER_NAME = "7058801";
+    private static final String BINDU_PASSWORD = "5243";
     private static final String LOGIN_URL = "https://bookings.traffordleisure.co.uk/Connect/MRMLogin.aspx";
-    private static final String ONE_HOUR_BADMINTON_SPORT_ID = "ctl00_MainContent__advanceSearchResultsUserControl_Activities_ctrl2_lnkActivitySelect_lg";
+    private static final String ALT_ONE_HOUR_BADMINTON_SPORT_ID = "ctl00_MainContent__advanceSearchResultsUserControl_Activities_ctrl2_lnkActivitySelect_lg";
+    private static final String SAL_ONE_HOUR_BADMINTON_SPORT_ID = "ctl00_MainContent__advanceSearchResultsUserControl_Activities_ctrl1_lnkActivitySelect_lg";
     private static final String PERSON_NAME = "Guntur Girl";
     private static final String CHANGE_SITE_BUTTON_ID = "ctl00__hyperLinkChangePreferredSiteFooter";
     private static final String DATE_TEXT_ID = "ctl00_MainContent_lblCurrentNavDate";
@@ -41,11 +46,12 @@ public class CourtBookingHeadlessTest {
     private WebDriver driver;
     static Logger logger = LoggerFactory.getLogger(CourtBookingHeadlessTest.class);
 
+
     @Parameter(value = 0)
     public String availabilityTime;
 
     @Parameter(value = 1)
-    public String leisureCentre;
+    public LeisureCentres leisureCentre;
 
     @Parameter(value = 2)
     public String userName;
@@ -61,28 +67,49 @@ public class CourtBookingHeadlessTest {
 
     private WebDriverWait wait;
 
+    public enum LeisureCentres {
+        ALT, SAL
+    }
+
+    // Saturday  8am–9pm  Sunday    8am–10pm  Monday	  8am–10pm  Tuesday	  8am–10pm
+   //  Wednesday 8am–10pm Thursday  8am–10pm  Friday	  8am–10pm
+
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"20:30", "ALT", SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.WEDNESDAY}, //play  Sunday(1)
+            //Thursday
+                {"19:00", SAL, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.THURSDAY},
+                {"19:00", SAL, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.THURSDAY},
+                {"20:00", SAL, BINDU_USER_NAME, BINDU_PASSWORD, 7, Calendar.THURSDAY},
+                {"19:00", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.THURSDAY},
+                {"19:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.THURSDAY},
+                {"20:00", ALT, BINDU_USER_NAME, BINDU_PASSWORD, 7, Calendar.THURSDAY},
+            //Saturday
+                {"08:00", SAL, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SATURDAY},
+                {"09:00", SAL, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.SATURDAY},
+                {"08:00", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SATURDAY},
+                {"09:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.SATURDAY},
+                {"15:00", ALT, BINDU_USER_NAME, BINDU_PASSWORD, 7, Calendar.SATURDAY},
+            //Sunday
+                {"08:00", SAL, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SUNDAY},
+                {"09:00", SAL, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.SUNDAY},
+                {"08:00", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SUNDAY},
+                {"09:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.SUNDAY},
 
-                {"19:00", "SAL", SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.THURSDAY},  //play Thursday (5)
-                {"19:30", "SAL", MANJU_USER_NAME, MANJU_PASSWORD,   7, Calendar.THURSDAY},  //play  Thursday(5)
-
-                {"18:00", "ALT", SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SATURDAY},  //play Saturday (7)
-                {"18:30", "ALT", MANJU_USER_NAME, MANJU_PASSWORD,   7, Calendar.SATURDAY},  //play  Saturday(7)
-
-                {"09:00", "SAL", SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SUNDAY},    //play  Sunday(1)
-                {"09:30", "SAL", MANJU_USER_NAME, MANJU_PASSWORD,   7, Calendar.SUNDAY},    //play  Sunday(1)
         });
     }
 
     @Before
     public void prepare() {
+        java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(java.util.logging.Level.OFF);
         setDriverSettings();
         performLogin();
         selectLeisureCentre();
-        scrollToFindElement(ONE_HOUR_BADMINTON_SPORT_ID);
+        if (leisureCentre == ALT) {
+            scrollToFindElement(ALT_ONE_HOUR_BADMINTON_SPORT_ID);
+        }
+        scrollToFindElement(SAL_ONE_HOUR_BADMINTON_SPORT_ID);
+
     }
 
     private void setDriverSettings() {
@@ -100,6 +127,7 @@ public class CourtBookingHeadlessTest {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         if (dayOfWeek == cal.get(Calendar.DAY_OF_WEEK)) {
+            logger.info(String.format("************************************************************"));
             logger.info(String.format("Running on  %s", getWeekDay(cal)));
             NavigateToRequiredDay();
 
@@ -111,8 +139,13 @@ public class CourtBookingHeadlessTest {
                 logger.info(String.format("Found a court at %s on %s", leisureCentre, availabilityDateTime));
                 Boolean isMaximumAllowedReached = driver.findElements(By.id("ctl00_MainContent_pnError")).size() > 0;
                 if (!isMaximumAllowedReached) {
-                    logger.info("URL ************" + driver.getCurrentUrl());
-                    driver.findElement(By.id("ctl00_MainContent_btnBasket")).click();
+//                    logger.info("On the confirm booking PAGE - URL ************" + driver.getCurrentUrl());
+
+                    WebElement bookButton = driver.findElement(By.id("ctl00_MainContent_btnBasket"));
+                    if(bookButton.isDisplayed()){
+                        logger.info("Clicking the BOOK button ");
+                        bookButton.click();
+                    }
                     String successText = driver.findElement(By.xpath("//div[contains(@class,'bookingConfirmedContent-content')]/h1")).getText();
                     logger.info(String.format(successText + " at %s on %s", leisureCentre, availabilityDateTime));
                 } else {
@@ -123,6 +156,8 @@ public class CourtBookingHeadlessTest {
                 logger.info(String.format("Court isn't available at %s for leisure centre %s", availabilityDateTime, leisureCentre));
             }
         }
+
+        logger.info(String.format("************************************************************"));
     }
 
     private String getWeekDay(Calendar cal) {
@@ -147,7 +182,7 @@ public class CourtBookingHeadlessTest {
         By id = By.id("ctl00_MainContent__ddlAvailableSites");
         wait.until(ExpectedConditions.elementToBeClickable(id));
         Select select = new Select(driver.findElement(id));
-        select.selectByValue(leisureCentre);
+        select.selectByValue(leisureCentre.name());
         driver.findElement(By.id("ctl00_MainContent__btnConfirm")).click();
 
     }
