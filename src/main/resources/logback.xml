@@ -2,7 +2,7 @@
 <configuration>
     <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <Pattern>%d{HH:mm:ss.SSS} >> %-3relative [%thread] %-5level	%logger{25} - %msg %n</Pattern>
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} >> %-3relative [%thread] %-5level	%logger{25} - %msg %n</Pattern>
         </encoder>
     </appender>
 
@@ -16,7 +16,7 @@
         </rollingPolicy>
 
         <encoder>
-            <Pattern>%d{HH:mm:ss} [%thread] %-5level %logger - %msg %n</Pattern>
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger - %msg %n</Pattern>
         </encoder>
     </appender>
 
