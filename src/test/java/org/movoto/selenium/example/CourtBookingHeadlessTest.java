@@ -72,27 +72,24 @@ public class CourtBookingHeadlessTest {
     }
 
     // Saturday  8am–9pm  Sunday    8am–10pm  Monday	  8am–10pm  Tuesday	  8am–10pm
-   //  Wednesday 8am–10pm Thursday  8am–10pm  Friday	  8am–10pm
+    //  Wednesday 8am–10pm Thursday  8am–10pm  Friday	  8am–10pm
 
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-            //Thursday
+
+                //Wednesday
+                {"20:00", ALT, BINDU_USER_NAME, BINDU_PASSWORD, 7, Calendar.WEDNESDAY},
+                {"20:30", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.WEDNESDAY},
+                {"21:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.WEDNESDAY},
+                //Thursday
                 {"19:00", SAL, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.THURSDAY},
                 {"19:00", SAL, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.THURSDAY},
-                {"20:00", SAL, BINDU_USER_NAME, BINDU_PASSWORD, 7, Calendar.THURSDAY},
-                {"19:00", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.THURSDAY},
-                {"19:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.THURSDAY},
-                {"20:00", ALT, BINDU_USER_NAME, BINDU_PASSWORD, 7, Calendar.THURSDAY},
-            //Saturday
-                {"08:00", SAL, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SATURDAY},
-                {"09:00", SAL, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.SATURDAY},
+                //Saturday
                 {"08:00", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SATURDAY},
                 {"09:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.SATURDAY},
                 {"15:00", ALT, BINDU_USER_NAME, BINDU_PASSWORD, 7, Calendar.SATURDAY},
-            //Sunday
-                {"08:00", SAL, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SUNDAY},
-                {"09:00", SAL, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.SUNDAY},
+                //Sunday
                 {"08:00", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SUNDAY},
                 {"09:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.SUNDAY},
 
@@ -142,9 +139,10 @@ public class CourtBookingHeadlessTest {
 //                    logger.info("On the confirm booking PAGE - URL ************" + driver.getCurrentUrl());
 
                     WebElement bookButton = driver.findElement(By.id("ctl00_MainContent_btnBasket"));
-                    if(bookButton.isDisplayed()){
-                        logger.info("Clicking the BOOK button ");
+                    if (bookButton.isDisplayed() && bookButton.isEnabled()) {
+                        logger.info("Clicking BOOK button ");
                         bookButton.click();
+                        logger.info("Clicked BOOK button ");
                     }
                     String successText = driver.findElement(By.xpath("//div[contains(@class,'bookingConfirmedContent-content')]/h1")).getText();
                     logger.info(String.format(successText + " at %s on %s", leisureCentre, availabilityDateTime));
