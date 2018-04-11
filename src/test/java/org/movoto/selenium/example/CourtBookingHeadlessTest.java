@@ -78,23 +78,22 @@ public class CourtBookingHeadlessTest {
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
 
-                //Wednesday
-                {"20:00", ALT, BINDU_USER_NAME, BINDU_PASSWORD, 7, Calendar.WEDNESDAY},
-                {"20:30", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.WEDNESDAY},
+//                //Wednesday
+                {"20:00", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.WEDNESDAY},
                 {"21:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.WEDNESDAY},
-                //Thursday
+//                //Thursday
                 {"19:00", SAL, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.THURSDAY},
                 {"19:00", SAL, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.THURSDAY},
-                //Saturday
-                {"08:00", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SATURDAY},
-                {"09:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.SATURDAY},
-                {"15:00", ALT, BINDU_USER_NAME, BINDU_PASSWORD, 7, Calendar.SATURDAY},
-                //Sunday
+//                //Friday
+                {"20:30", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.FRIDAY},
+                {"21:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.FRIDAY},
+//                //Sunday
                 {"08:00", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SUNDAY},
                 {"09:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.SUNDAY},
 
         });
     }
+
 
     @Before
     public void prepare() {
@@ -104,8 +103,9 @@ public class CourtBookingHeadlessTest {
         selectLeisureCentre();
         if (leisureCentre == ALT) {
             scrollToFindElement(ALT_ONE_HOUR_BADMINTON_SPORT_ID);
+        } else {
+            scrollToFindElement(SAL_ONE_HOUR_BADMINTON_SPORT_ID);
         }
-        scrollToFindElement(SAL_ONE_HOUR_BADMINTON_SPORT_ID);
 
     }
 
@@ -124,7 +124,7 @@ public class CourtBookingHeadlessTest {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         if (dayOfWeek == cal.get(Calendar.DAY_OF_WEEK)) {
-            logger.info(String.format("************************************************************"));
+            logger.info(String.format("****EACH RUN****AT*****" + leisureCentre + "****USER****" + userName));
             logger.info(String.format("Running on  %s", getWeekDay(cal)));
             NavigateToRequiredDay();
 
@@ -137,13 +137,18 @@ public class CourtBookingHeadlessTest {
                 Boolean isMaximumAllowedReached = driver.findElements(By.id("ctl00_MainContent_pnError")).size() > 0;
                 if (!isMaximumAllowedReached) {
 //                    logger.info("On the confirm booking PAGE - URL ************" + driver.getCurrentUrl());
-
                     WebElement bookButton = driver.findElement(By.id("ctl00_MainContent_btnBasket"));
-                    if (bookButton.isDisplayed() && bookButton.isEnabled()) {
+                    if (bookButton.isDisplayed()) {
                         logger.info("Clicking BOOK button ");
-                        bookButton.click();
+                        try {
+                            bookButton.submit();
+                        } catch (Exception e) {
+                            logger.info("Exception occurred ");
+                            logger.error(e.getMessage());
+                        }
                         logger.info("Clicked BOOK button ");
                     }
+                    logger.info("Before getting success text");
                     String successText = driver.findElement(By.xpath("//div[contains(@class,'bookingConfirmedContent-content')]/h1")).getText();
                     logger.info(String.format(successText + " at %s on %s", leisureCentre, availabilityDateTime));
                 } else {
@@ -155,7 +160,6 @@ public class CourtBookingHeadlessTest {
             }
         }
 
-        logger.info(String.format("************************************************************"));
     }
 
     private String getWeekDay(Calendar cal) {
@@ -208,6 +212,7 @@ public class CourtBookingHeadlessTest {
 
     @After
     public void teardown() throws IOException {
+        driver.close();
         driver.quit();
     }
 
