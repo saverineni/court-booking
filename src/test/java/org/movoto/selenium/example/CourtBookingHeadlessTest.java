@@ -79,7 +79,7 @@ public class CourtBookingHeadlessTest {
         return Arrays.asList(new Object[][]{
 
 //                //Wednesday
-                {"20:00", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.WEDNESDAY},
+                {"20:30", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.WEDNESDAY},
                 {"21:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.WEDNESDAY},
 //                //Thursday
                 {"19:00", SAL, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.THURSDAY},
@@ -89,7 +89,7 @@ public class CourtBookingHeadlessTest {
                 {"21:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.FRIDAY},
 //                //Sunday
                 {"08:00", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SUNDAY},
-                {"09:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.SUNDAY},
+                {"08:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.SUNDAY},
 
         });
     }
