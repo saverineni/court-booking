@@ -9,7 +9,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -77,17 +76,16 @@ public class CourtBookingHeadlessTest {
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-
-//                //Wednesday
-                {"20:30", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.WEDNESDAY},
-                {"21:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.WEDNESDAY},
-//                //Thursday
+                //Wednesday
+                {"20:00", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.WEDNESDAY},
+                {"20:30", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.WEDNESDAY},
+                //Thursday
                 {"19:00", SAL, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.THURSDAY},
                 {"19:00", SAL, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.THURSDAY},
-//                //Friday
-                {"20:30", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.FRIDAY},
-                {"21:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.FRIDAY},
-//                //Sunday
+                //Friday
+                {"20:00", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.FRIDAY},
+                {"20:30", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.FRIDAY},
+                //Sunday
                 {"08:00", ALT, SURESH_USER_NAME, SURESH_PASSWORD, 7, Calendar.SUNDAY},
                 {"08:00", ALT, MANJU_USER_NAME, MANJU_PASSWORD, 7, Calendar.SUNDAY},
 
@@ -110,7 +108,7 @@ public class CourtBookingHeadlessTest {
     }
 
     private void setDriverSettings() {
-        driver = new HtmlUnitDriver(true);
+        driver = DriverFactory.createDriver("chrome");
         driver.manage().timeouts().implicitlyWait(TIME_OUT, TimeUnit.SECONDS);
         driver.manage().timeouts().pageLoadTimeout(TIME_OUT, TimeUnit.SECONDS);
         driver.manage().timeouts().setScriptTimeout(TIME_OUT, TimeUnit.SECONDS);
@@ -124,7 +122,7 @@ public class CourtBookingHeadlessTest {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         if (dayOfWeek == cal.get(Calendar.DAY_OF_WEEK)) {
-            logger.info(String.format("****EACH RUN****AT*****" + leisureCentre + "****USER****" + userName));
+            logger.info(String.format("****Booking at*****" + leisureCentre + "****USER****" + userName));
             logger.info(String.format("Running on  %s", getWeekDay(cal)));
             NavigateToRequiredDay();
 
@@ -139,16 +137,13 @@ public class CourtBookingHeadlessTest {
 //                    logger.info("On the confirm booking PAGE - URL ************" + driver.getCurrentUrl());
                     WebElement bookButton = driver.findElement(By.id("ctl00_MainContent_btnBasket"));
                     if (bookButton.isDisplayed()) {
-                        logger.info("Clicking BOOK button ");
                         try {
-                            bookButton.submit();
+                            bookButton.click();
                         } catch (Exception e) {
                             logger.info("Exception occurred ");
                             logger.error(e.getMessage());
                         }
-                        logger.info("Clicked BOOK button ");
                     }
-                    logger.info("Before getting success text");
                     String successText = driver.findElement(By.xpath("//div[contains(@class,'bookingConfirmedContent-content')]/h1")).getText();
                     logger.info(String.format(successText + " at %s on %s", leisureCentre, availabilityDateTime));
                 } else {
