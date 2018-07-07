@@ -5,10 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -21,8 +18,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.Thread.sleep;
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
 
@@ -73,12 +72,13 @@ public class CourtBookingTest {
     }
 
     @Before
-    public void prepare() {
+    public void prepare() throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", "webdriver/chromedriver");
         setDriverSettings();
-        performLogin();
-        selectLeisureCentre();
-        scrollToFindElement(ONE_HOUR_BADMINTON_SPORT_ID);
+        postToWhatsapp("10:30");
+//        performLogin();
+//        selectLeisureCentre();
+//        scrollToFindElement(ONE_HOUR_BADMINTON_SPORT_ID);
     }
 
     private void setDriverSettings() {
@@ -160,8 +160,11 @@ public class CourtBookingTest {
         }
     }
 
-    private void postToWhatsapp(String availabilityDateTime) {
-        driver.get(WHATSAPP_LINK);
+    private void postToWhatsapp(String availabilityDateTime) throws InterruptedException {
+        Set<Cookie> cookies = driver.manage().getCookies();
+
+        driver.get("https://api.whatsapp.com/send?phone=15551234567&text=I'm%20interested%20in%20your%20car%20for%20sale");
+        sleep(15000);
         driver.findElement(By.cssSelector("span[title='" + PERSON_NAME + "']")).click();
 
         List<WebElement> list = driver.findElements(By.className("input"));
