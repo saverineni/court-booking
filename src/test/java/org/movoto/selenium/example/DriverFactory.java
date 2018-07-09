@@ -17,23 +17,17 @@ class DriverFactory {
     }
 
     private static ChromeDriver createChromeDriver() {
-
-
-        if (isWindows()) {
-            File chromeDriver = new File("drivers/windows/chrome/chromedriver.exe");
-            System.setProperty("webdriver.chrome.driver", chromeDriver.getAbsolutePath());
-        } else if (isMac()) {
+        File chromeDriver = null;
+        ChromeOptions options = new ChromeOptions();
+         if (isMac()) {
             URL url = Thread.currentThread().getContextClassLoader().getResource("drivers/mac/chrome/chromedriver");
-            File chromeDriver = new File(url.getPath());
-            System.setProperty("webdriver.chrome.driver", chromeDriver.getAbsolutePath());
+            chromeDriver = new File(url.getPath());
         } else if (isLinux()) {
             URL url = Thread.currentThread().getContextClassLoader().getResource("drivers/linux/chrome/chromedriver");
-            File chromeDriver = new File(url.getPath());
-            System.setProperty("webdriver.chrome.driver", chromeDriver.getAbsolutePath());
+            chromeDriver = new File(url.getPath());
+            options.addArguments("--headless","--disable-gpu", "--no-sandbox");
         }
-
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless","--disable-gpu", "--no-sandbox");
+        System.setProperty("webdriver.chrome.driver", chromeDriver.getAbsolutePath());
         return new ChromeDriver(options);
     }
 
